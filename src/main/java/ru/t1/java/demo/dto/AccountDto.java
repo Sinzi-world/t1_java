@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class AccountDto {
-    private long id;
+    private Long accountId;
+    private Long clientId;
     private String accountType;
     private BigDecimal balance;
 }
