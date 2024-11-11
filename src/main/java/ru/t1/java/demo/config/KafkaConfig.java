@@ -35,12 +35,12 @@ public class KafkaConfig {
     private String maxPollRecords;
     @Value("${t1.kafka.poll.interval.ms}")
     private String maxPollIntervalsMs;
-//    @Value("${t1.kafka.topic.metrics}")
-//    private String metricsTopic;
-//    @Value("${t1.kafka.topic.accounts}")
-//    private String accountsTopic;
-//    @Value("${t1.kafka.topic.transactions}")
-//    private String transactionsTopic;
+    @Value("${t1.kafka.topic.metrics}")
+    private String metricsTopic;
+    @Value("${t1.kafka.topic.accounts}")
+    private String accountsTopic;
+    @Value("${t1.kafka.topic.transactions}")
+    private String transactionsTopic;
 
 
     @Bean
