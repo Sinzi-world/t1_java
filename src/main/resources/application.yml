@@ -24,6 +24,8 @@ t1:
       server: ${KAFKA_SERVER:localhost:9092}
     consumer:
       group-id: t1-demo
+      enable-auto-commit: false
+      auto-offset-reset: earliest
       max.poll.records: 10
     producer:
       enable: true
