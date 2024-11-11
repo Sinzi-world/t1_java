@@ -22,6 +22,17 @@ t1:
   kafka:
     bootstrap:
       server: ${KAFKA_SERVER:localhost:9092}
+    session:
+      timeout:
+        ms: 15000
+    max:
+      partition:
+        fetch:
+          bytes: 300000
+    poll:
+      records: 1
+      interval:
+        ms: 3000
     consumer:
       group-id: t1-demo
       enable-auto-commit: false
