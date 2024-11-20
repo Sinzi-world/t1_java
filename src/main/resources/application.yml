@@ -12,8 +12,53 @@ spring:
 
 logging:
   level:
-    ROOT: INFO
+    ROOT: DEBUG
     ru.t1.java.demo.controller.ClientController: DEBUG
+    org.apache.kafka: INFO
+    org.hibernate.SQL: INFO
 
 t1:
   scan-path: ru.t1.java.demo
+  kafka:
+    bootstrap:
+      server: ${KAFKA_SERVER:localhost:9092}
+    session:
+      timeout:
+        ms: 15000
+    max:
+      partition:
+        fetch:
+          bytes: 300000
+    poll:
+      records: 1
+      interval:
+        ms: 3000
+    consumer:
+      group-id: t1-demo
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max.poll.records: 10
+    producer:
+      enable: true
+    topic:
+      client_registration: t1_demo_client_registration
+      client_id_registered: t1_demo_client_registered
+      client_transactions: t1_demo_client_transactions
+      metrics: t1_demo_metrics
+      accounts: t1_demo_accounts
+      transactions: t1_demo_transactions
+    listener:
+      poll-timeout: 1000
+
+
+track:
+  errors-to-track: JsonParseException, IOException
+  kafka:
+    enabled: ${TRACK_KAFKA_LOG_ENABLED:true}
+    bootstrap-server: localhost:9092
+    data-source-error-topic: t1_demo_data_source_error
+    time-limit-exceed: t1_demo_time_limit_exceed
+  db:
+    enabled: false
+  time-limit-exceed: 1000
+  log-level: DEBUG

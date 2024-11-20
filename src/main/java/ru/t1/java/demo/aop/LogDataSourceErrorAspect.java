@@ -1,43 +1,77 @@
 package ru.t1.java.demo.aop;
 
-import org.aspectj.lang.annotation.AfterThrowing;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.DataSourceErrorLog;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+@Slf4j
 @Aspect
 @Component
 public class LogDataSourceErrorAspect {
 
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final DataSourceErrorLogRepository errorLogRepository;
 
-    @Autowired
-    public LogDataSourceErrorAspect(DataSourceErrorLogRepository errorLogRepository) {
+    @Value("${t1.kafka.topic.errors}")
+    private String errorTopic;
+
+    public LogDataSourceErrorAspect(KafkaTemplate<String, String> kafkaTemplate, DataSourceErrorLogRepository errorLogRepository) {
+        this.kafkaTemplate = kafkaTemplate;
         this.errorLogRepository = errorLogRepository;
     }
 
-    // Перехватывает исключения при выполнении любых методов CRUD в репозиториях
-    @AfterThrowing(pointcut = "execution(* ru.t1.java.demo.repository.*.*(..))", throwing = "ex")
-    public void logDataSourceError(Exception ex) {
-        // Создаем новую запись об ошибке
-        DataSourceErrorLog errorLog = DataSourceErrorLog.builder()
-                .message(ex.getMessage())
-                .stackTrace(getStackTraceAsString(ex))
-                .methodSignature("")
-                .build();
-
-        // Сохраняем запись в таблице DataSourceErrorLog
-        errorLogRepository.save(errorLog);
+    @Around("@annotation(LogDataSourceError)")
+    public Object logErrorAndSendToKafka(ProceedingJoinPoint joinPoint) throws Throwable {
+        try {
+            return joinPoint.proceed();
+        } catch (Exception ex) {
+            log.error("Ошибка при выполнении метода: {}", ex.getMessage(), ex);
+            boolean kafkaFailed = !sendErrorToKafka(ex, joinPoint);
+            if (kafkaFailed) {
+                saveErrorToDatabase(ex, joinPoint);
+            }
+            throw ex;
+        }
     }
 
-    // Преобразование stack trace в строку для сохранения в базе данных
-    private String getStackTraceAsString(Exception ex) {
-        StringBuilder sb = new StringBuilder();
-        for (StackTraceElement element : ex.getStackTrace()) {
-            sb.append(element.toString()).append("\n");
+    private boolean sendErrorToKafka(Exception ex, ProceedingJoinPoint joinPoint) {
+        try {
+            String methodName = joinPoint.getSignature().toShortString();
+            String message = String.format("Ошибка в методе %s: %s", methodName, ex.getMessage());
+            kafkaTemplate.send(errorTopic, message);
+            return true; // Kafka отправка успешна
+        } catch (Exception kafkaEx) {
+            log.error("Не удалось отправить ошибку в Kafka: {}", kafkaEx.getMessage(), kafkaEx);
+            return false; // Kafka отправка провалилась
         }
-        return sb.toString();
+    }
+
+    private void saveErrorToDatabase(Exception ex, ProceedingJoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().toShortString();
+        DataSourceErrorLog errorLog = DataSourceErrorLog.builder()
+                .stackTrace(getStackTraceAsString(ex))
+                .message(ex.getMessage())
+                .methodSignature(methodName)
+                .build();
+        errorLogRepository.save(errorLog);
+        log.info("Ошибка записана в базу данных: {}", errorLog);
+    }
+
+    private String getStackTraceAsString(Exception ex) {
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 }
+
+
+

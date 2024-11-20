@@ -6,13 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class TransactionDto {
-
-    private long id;
+    private Long transactionId;
+    private Long accountId;
     private BigDecimal transactionAmount;
+    private LocalDateTime transactionTime;
 }
