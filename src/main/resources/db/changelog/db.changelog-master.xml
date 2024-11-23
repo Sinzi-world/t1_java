@@ -18,4 +18,8 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
         <sqlFile encoding="utf8" path="db/changelog/2024/09/t1_java-initial-changelog.sql"/>
     </changeSet>
 
+    <changeSet id="update-transaction-account-client-2024-11-21" author="ABolotov">
+    <sqlFile encoding="utf8" path="/db/changelog/2024/09/t1_java_update_db_V002.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

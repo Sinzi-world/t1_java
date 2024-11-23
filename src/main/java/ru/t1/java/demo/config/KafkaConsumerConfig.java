@@ -32,7 +32,7 @@ public class KafkaConsumerConfig {
     @Value("${t1.kafka.max.partition.fetch.bytes}")
     private String maxPartitionFetchBytes;
 
-    @Value("${t1.kafka.max.poll.records}")
+    @Value("${t1.kafka.consumer.max.poll.records}")
     private String maxPollRecords;
 
     @Value("${t1.kafka.max.poll.interval.ms}")

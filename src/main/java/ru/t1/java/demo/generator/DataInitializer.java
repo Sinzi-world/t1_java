@@ -13,7 +13,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        dataGenerator.generateData(10, 5, 20); // Генерация 10 клиентов, 5 аккаунтов на клиента и 20 транзакций на аккаунт
+        dataGenerator.generateData(10, 5, 20);
     }
 }
 

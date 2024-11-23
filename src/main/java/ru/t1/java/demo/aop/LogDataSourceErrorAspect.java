@@ -19,14 +19,14 @@ import java.io.StringWriter;
 public class LogDataSourceErrorAspect {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final DataSourceErrorLogRepository errorLogRepository;
+    private final DataSourceErrorLogRepository dataSourceErrorLogRepository;
 
     @Value("${t1.kafka.topic.errors}")
     private String errorTopic;
 
-    public LogDataSourceErrorAspect(KafkaTemplate<String, String> kafkaTemplate, DataSourceErrorLogRepository errorLogRepository) {
+    public LogDataSourceErrorAspect(KafkaTemplate<String, String> kafkaTemplate, DataSourceErrorLogRepository dataSourceErrorLogRepository) {
         this.kafkaTemplate = kafkaTemplate;
-        this.errorLogRepository = errorLogRepository;
+        this.dataSourceErrorLogRepository = dataSourceErrorLogRepository;
     }
 
     @Around("@annotation(LogDataSourceError)")
@@ -62,7 +62,7 @@ public class LogDataSourceErrorAspect {
                 .message(ex.getMessage())
                 .methodSignature(methodName)
                 .build();
-        errorLogRepository.save(errorLog);
+        dataSourceErrorLogRepository.save(errorLog);
         log.info("Ошибка записана в базу данных: {}", errorLog);
     }
 

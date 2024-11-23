@@ -30,7 +30,7 @@ public class KafkaConfig {
     private String maxPartitionFetchBytes;
     @Value("${t1.kafka.max.poll.records}")
     private String maxPollRecords;
-    @Value("${t1.kafka.poll.interval.ms}")
+    @Value("${t1.kafka.max.poll.interval.ms}")
     private String maxPollIntervalsMs;
     @Value("${t1.kafka.topic.metrics}")
     private String metricsTopic;

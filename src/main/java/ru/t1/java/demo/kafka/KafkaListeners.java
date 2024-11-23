@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.t1.java.demo.dto.AccountDto;
 import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.model.Account;
-import ru.t1.java.demo.model.AccountType;
+import ru.t1.java.demo.model.enums.AccountType;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.repository.AccountRepository;
