@@ -39,7 +39,6 @@ public class KafkaListeners {
         log.info("Saved Account to DB: {}", account);
     }
 
-    // Слушаем топик t1_demo_transactions
     @KafkaListener(topics = "${t1.kafka.topic.transactions}", groupId = "${t1.kafka.consumer.group-id}")
     public void listenTransaction(TransactionDto transactionDto) {
         log.info("Received Transaction message: {}", transactionDto);

@@ -7,7 +7,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,8 +19,6 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
-import ru.t1.java.demo.dto.ClientDto;
-import ru.t1.java.demo.kafka.KafkaClientProducer;
 import ru.t1.java.demo.kafka.MessageDeserializer;
 
 import java.util.HashMap;
@@ -43,8 +40,6 @@ public class KafkaConfig{
     private String maxPollRecords;
     @Value("${t1.kafka.max.poll.interval.ms:3000}")
     private String maxPollIntervalsMs;
-    @Value("${t1.kafka.topic.client_id_registered}")
-    private String clientTopic;
 
 
     @Bean
@@ -67,51 +62,34 @@ public class KafkaConfig{
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-//    @Bean
-//    ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory
-//            (@Qualifier("consumerListenerFactory")
-//             ConsumerFactory<String, Object> consumerFactory) {
-//        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
-//                new ConcurrentKafkaListenerContainerFactory<>();
-//        factoryBuilder(consumerFactory, factory);
-//        return factory;
-//    }
-
-//    private <T> void factoryBuilder(ConsumerFactory<String, T> consumerFactory, ConcurrentKafkaListenerContainerFactory<String, T> factory) {
-//        factory.setConsumerFactory(consumerFactory);
-//        factory.setBatchListener(true);
-//        factory.setConcurrency(1);
-//        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-//        factory.getContainerProperties().setPollTimeout(5000);
-//        factory.getContainerProperties().setMicrometerEnabled(true);
-//        factory.setCommonErrorHandler(errorHandler());
-//    }
-//
-//    private CommonErrorHandler errorHandler() {
-//        DefaultErrorHandler handler = new DefaultErrorHandler(new FixedBackOff(1000, 3));
-//        handler.addNotRetryableExceptions(IllegalStateException.class);
-//        handler.setRetryListeners((record, ex, deliveryAttempt) -> {
-//            log.error(" RetryListeners message = {}, offset = {} deliveryAttempt = {}", ex.getMessage(), record.offset(), deliveryAttempt);
-//        });
-//        return handler;
-//    }
-//
     @Bean
-    @Primary
-    public KafkaTemplate<String, Object> kafkaTemplate
-            (@Qualifier("producerFactory") ProducerFactory<String, Object>
-                     producerPatFactory) {
-        return new KafkaTemplate<>(producerPatFactory);
+    ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory
+            (@Qualifier("consumerListenerFactory")
+             ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factoryBuilder(consumerFactory, factory);
+        return factory;
     }
 
-//    @Bean
-//    @ConditionalOnProperty(value = "t1.kafka.producer.enable",
-//            havingValue = "true",
-//            matchIfMissing = true)
-//    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, Object> template) {
-//        template.setDefaultTopic(clientTopic);
-//        return new KafkaClientProducer(template);
-//    }
+    private <T> void factoryBuilder(ConsumerFactory<String, T> consumerFactory, ConcurrentKafkaListenerContainerFactory<String, T> factory) {
+        factory.setConsumerFactory(consumerFactory);
+        factory.setBatchListener(true);
+        factory.setConcurrency(1);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.getContainerProperties().setPollTimeout(5000);
+        factory.getContainerProperties().setMicrometerEnabled(true);
+        factory.setCommonErrorHandler(errorHandler());
+    }
+
+    private CommonErrorHandler errorHandler() {
+        DefaultErrorHandler handler = new DefaultErrorHandler(new FixedBackOff(1000, 3));
+        handler.addNotRetryableExceptions(IllegalStateException.class);
+        handler.setRetryListeners((record, ex, deliveryAttempt) -> {
+            log.error(" RetryListeners message = {}, offset = {} deliveryAttempt = {}", ex.getMessage(), record.offset(), deliveryAttempt);
+        });
+        return handler;
+    }
 
     @Bean("producerFactory")
     public ProducerFactory<String, Object> producerFactory() {
@@ -125,4 +103,11 @@ public class KafkaConfig{
         return new DefaultKafkaProducerFactory<>(props);
     }
 
+    @Bean
+    @Primary
+    public KafkaTemplate<String, Object> kafkaTemplate
+            (@Qualifier("producerFactory") ProducerFactory<String, Object>
+                     producerPatFactory) {
+        return new KafkaTemplate<>(producerPatFactory);
+    }
 }

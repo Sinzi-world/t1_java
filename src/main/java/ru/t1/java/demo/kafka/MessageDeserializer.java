@@ -1,6 +1,5 @@
 package ru.t1.java.demo.kafka;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.header.Headers;
@@ -11,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class MessageDeserializer<T> extends JsonDeserializer<T> {
 
     private static String getMessage(byte[] data) {
