@@ -13,7 +13,7 @@ spring:
 logging:
   level:
     ROOT: DEBUG
-    ru.t1.java.demo.controller.ClientController: DEBUG
+    ru.t1.java.demo.controller: DEBUG
     org.apache.kafka: INFO
     org.hibernate.SQL: INFO
 
@@ -29,10 +29,10 @@ t1:
       partition:
         fetch:
           bytes: 300000
-    poll:
-      records: 1
-      interval:
-        ms: 3000
+      poll:
+        records: 1
+        interval:
+          ms: 3000
     consumer:
       group-id: t1-demo
       enable-auto-commit: false
@@ -47,9 +47,9 @@ t1:
       metrics: t1_demo_metrics
       accounts: t1_demo_accounts
       transactions: t1_demo_transactions
+      errors: t1_demo_errors
     listener:
       poll-timeout: 1000
-
 
 track:
   errors-to-track: JsonParseException, IOException

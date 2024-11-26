@@ -1,12 +1,13 @@
 package ru.t1.java.demo.aop;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import ru.t1.java.demo.kafka.KafkaProducer;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 
@@ -16,18 +17,14 @@ import java.io.StringWriter;
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class LogDataSourceErrorAspect {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final DataSourceErrorLogRepository errorLogRepository;
-
+    private final KafkaProducer kafkaProducer;
     @Value("${t1.kafka.topic.errors}")
     private String errorTopic;
 
-    public LogDataSourceErrorAspect(KafkaTemplate<String, String> kafkaTemplate, DataSourceErrorLogRepository errorLogRepository) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.errorLogRepository = errorLogRepository;
-    }
+    private final DataSourceErrorLogRepository dataSourceErrorLogRepository;
 
     @Around("@annotation(LogDataSourceError)")
     public Object logErrorAndSendToKafka(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -47,7 +44,7 @@ public class LogDataSourceErrorAspect {
         try {
             String methodName = joinPoint.getSignature().toShortString();
             String message = String.format("Ошибка в методе %s: %s", methodName, ex.getMessage());
-            kafkaTemplate.send(errorTopic, message);
+            kafkaProducer.sendMessage(errorTopic, message);
             return true; // Kafka отправка успешна
         } catch (Exception kafkaEx) {
             log.error("Не удалось отправить ошибку в Kafka: {}", kafkaEx.getMessage(), kafkaEx);
@@ -62,7 +59,7 @@ public class LogDataSourceErrorAspect {
                 .message(ex.getMessage())
                 .methodSignature(methodName)
                 .build();
-        errorLogRepository.save(errorLog);
+        dataSourceErrorLogRepository.save(errorLog);
         log.info("Ошибка записана в базу данных: {}", errorLog);
     }
 

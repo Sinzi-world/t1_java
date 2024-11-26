@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.t1.java.demo.dto.AccountDto;
 import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.model.Account;
-import ru.t1.java.demo.model.AccountType;
+import ru.t1.java.demo.model.enums.AccountType;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.repository.AccountRepository;
@@ -39,7 +39,6 @@ public class KafkaListeners {
         log.info("Saved Account to DB: {}", account);
     }
 
-    // Слушаем топик t1_demo_transactions
     @KafkaListener(topics = "${t1.kafka.topic.transactions}", groupId = "${t1.kafka.consumer.group-id}")
     public void listenTransaction(TransactionDto transactionDto) {
         log.info("Received Transaction message: {}", transactionDto);

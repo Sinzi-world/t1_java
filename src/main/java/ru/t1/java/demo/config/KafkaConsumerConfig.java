@@ -26,24 +26,6 @@ public class KafkaConsumerConfig {
     @Value("${t1.kafka.consumer.group-id}")
     private String groupId;
 
-    @Value("${t1.kafka.session.timeout.ms}")
-    private String sessionTimeout;
-
-    @Value("${t1.kafka.max.partition.fetch.bytes}")
-    private String maxPartitionFetchBytes;
-
-    @Value("${t1.kafka.max.poll.records}")
-    private String maxPollRecords;
-
-    @Value("${t1.kafka.max.poll.interval.ms}")
-    private String maxPollIntervalsMs;
-
-    @Value("${t1.kafka.topic.accounts}")
-    private String accountsTopic;
-
-    @Value("${t1.kafka.topic.transactions}")
-    private String transactionsTopic;
-
     @Bean
     public ConsumerFactory<String, AccountDto> accountConsumerFactory() {
         Map<String, Object> props = new HashMap<>();

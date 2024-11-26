@@ -1,27 +1,25 @@
 package ru.t1.java.demo.aop;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import ru.t1.java.demo.kafka.KafkaProducer;
 
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class MetricAspect {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-
+    private final KafkaProducer kafkaProducer;
     @Value("${t1.kafka.topic.metrics}")
     private String metricsTopic;
 
-    public MetricAspect(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
 
     @Around("@annotation(metric)")
     public Object measureMethodExecution(ProceedingJoinPoint joinPoint, Metric metric) throws Throwable {
@@ -46,7 +44,7 @@ public class MetricAspect {
             String message = isError
                     ? String.format("Метод %s завершился с ошибкой: %s. Время выполнения: %d мс", methodName, errorMessage, executionTime)
                     : String.format("Метод %s превысил время выполнения: %d мс", methodName, executionTime);
-            kafkaTemplate.send(metricsTopic, message);
+            kafkaProducer.sendMessage(metricsTopic, message);
         } catch (Exception e) {
             log.error("Не удалось отправить метрику в Kafka: {}", e.getMessage(), e);
         }
