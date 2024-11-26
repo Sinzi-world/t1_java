@@ -103,7 +103,7 @@ public class KafkaConfig{
                      producerPatFactory) {
         return new KafkaTemplate<>(producerPatFactory);
     }
-//
+
 //    @Bean
 //    @ConditionalOnProperty(value = "t1.kafka.producer.enable",
 //            havingValue = "true",
