@@ -13,7 +13,7 @@ spring:
 logging:
   level:
     ROOT: DEBUG
-    ru.t1.java.demo.controller.ClientController: DEBUG
+    ru.t1.java.demo.controller: DEBUG
     org.apache.kafka: INFO
     org.hibernate.SQL: INFO
 
@@ -50,7 +50,6 @@ t1:
       errors: t1_demo_errors
     listener:
       poll-timeout: 1000
-
 
 track:
   errors-to-track: JsonParseException, IOException
