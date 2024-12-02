@@ -1,27 +1,37 @@
 package ru.t1.java.demo.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.repository.AccountRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    @Autowired
-    public AccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public Optional<Account> getAccountById(Long accountId) {
+        return accountRepository.findById(accountId);
     }
 
-    public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+    public void updateAccount(Account account) {
+        accountRepository.save(account);
     }
 
-    public Account createAccount(Account account) {
-        return accountRepository.save(account);
+    public void updateAccountBalance(Long accountId, BigDecimal newBalance) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        account.setBalance(newBalance);
+
+        accountRepository.save(account);
+        log.info("Аккаунт с ID {} обновлен. Новый баланс: {}", accountId, newBalance);
     }
 }
