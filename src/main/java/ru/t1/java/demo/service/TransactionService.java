@@ -3,15 +3,12 @@ package ru.t1.java.demo.service;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.TransactionStatus;
-import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.TransactionRepository;
-
-import java.math.BigDecimal;
 import java.util.List;
 
+@Data
 @Service
 public class TransactionService {
 

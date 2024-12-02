@@ -22,4 +22,17 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <sqlFile encoding="utf8" path="/db/changelog/2024/09/t1_java_update_db_V002.sql"/>
     </changeSet>
 
+    <changeSet author="your-name" id="1">
+        <createTable tableName="data_source_error_log">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="message" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stack_trace" type="TEXT"/>
+            <column name="method_signature" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
