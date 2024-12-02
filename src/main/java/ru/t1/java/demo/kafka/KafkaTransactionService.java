@@ -1,10 +1,9 @@
-package ru.t1.java.demo.service;
+package ru.t1.java.demo.kafka;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.t1.java.demo.kafka.KafkaProducer;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.TransactionAcceptMessageDto;
