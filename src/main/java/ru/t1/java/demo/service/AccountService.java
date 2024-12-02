@@ -2,7 +2,6 @@ package ru.t1.java.demo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.repository.AccountRepository;
@@ -22,6 +21,11 @@ public class AccountService {
         return accountRepository.findById(accountId);
     }
 
+    public Account createAccount(Account account) {
+        accountRepository.save(account);
+        return account;
+    }
+
     public void updateAccount(Account account) {
         accountRepository.save(account);
     }
@@ -33,5 +37,9 @@ public class AccountService {
 
         accountRepository.save(account);
         log.info("Аккаунт с ID {} обновлен. Новый баланс: {}", accountId, newBalance);
+    }
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
     }
 }
